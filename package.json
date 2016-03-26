@@ -1,0 +1,15 @@
+{
+  "name": "expressjs-counter",
+  "version": "0.0.0",
+  "description": "example of express.js web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "retorillo",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4"
+  }
+}
