@@ -5,16 +5,46 @@ html(lang="en")
     title #{pageTitle}
     meta(name="viewport", content="width=device-width, initial-scale=1")
     link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+    script(type="text/javascript", src="http://code.jquery.com/jquery-2.2.3.min.js",
+      integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=", crossorigin="anonymous")
+    script(type="text/javascript", 
+      src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js")
   body
     div(class="container")
       div(class="row")
         div(class="col-xs-8 col-xs-offset-2")
           h1 Express.js Counter
-          p Current value is
-            strong(class="text-success") &nbsp;#{counter}
-          p(class={"text-primary": !err, "text-danger": err}) #{msg}
-          form(class="form", method="post")
-            div(class={"form-group": true, "has-error": err})
+          p Current value is &nbsp;
+            strong(class="text-success" data-bind="text: count")
+          p(data-bind="text: msg")
+          div(class="form")
+            div(class={"form-group": true})
               label(class="control-label") Incremental value
-              input(class="form-control", autocomplete="off", value=lastinc, name="inc", type="text")
-            input(class="btn btn-primary", type="submit", value="Increment")
+              input(class="form-control", autocomplete="off", data-bind="value: incval", type="text")
+            button(class="btn btn-primary", value="Increment", data-bind="click: increment") Increment
+    script(type='text/javascript').
+      $(function() {
+        var viewmodel = {
+          count: ko.observable(0),
+          msg: ko.observable(''),
+          incval: ko.observable(1),
+          postReq: function(incval, updateMessage) {
+            $.ajax({ method: 'POST',
+                      url: '/inc',
+                      data: { incval: incval },
+                      dataType: 'json'  }).success(function (data) {
+                viewmodel.count(data.count);
+                if (updateMessage)
+                  viewmodel.msg(data.msg);
+            });
+          },
+          update: function() {
+            viewmodel.postReq(0);
+          },
+          increment: function () {
+            viewmodel.postReq(viewmodel.incval(), true);            
+          }
+        };
+        ko.applyBindings(viewmodel);
+        viewmodel.update();
+      });
